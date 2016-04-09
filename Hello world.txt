@@ -1,5 +1,5 @@
-print("hello world");
-print("hello world2");
-print("hello");
 1234
 729
+print("hello world");1
+print("hello world2");1
+print("hello");1
