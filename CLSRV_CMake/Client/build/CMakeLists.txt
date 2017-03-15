@@ -6,5 +6,5 @@ aux_source_directory(${SOURCE_ROOT} SOURCES)
 find_package(Boost 1.58.0 REQUIRED system)
 set(CMAKE_CXX_FLAGS "-Wall -std=c++0x")
 add_executable(${BIN} ${SOURCES})
-target_link_libraries( ${BIN} ${Boost_LIBRARIES})
+target_link_libraries( ${BIN} ${Boost_LIBRARIES} -pthread -lboost_log -lboost_thread)
 
