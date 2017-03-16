@@ -5,7 +5,6 @@
 #include <iostream>
 #include <string>
 #include <boost/asio.hpp>//libws2_32.a, libboost_system.a
-#include <conio.h>
 
 using boost::asio::ip::tcp;
 
