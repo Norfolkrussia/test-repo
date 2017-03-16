@@ -1,7 +1,7 @@
 // Server.cpp : Defines the entry point for the console application.
 //
 
-#include "stdafx.h"
+//#include "stdafx.h"
 #include <iostream>
 #include <string>
 #include <boost/asio.hpp>//libws2_32.a, libboost_system.a
