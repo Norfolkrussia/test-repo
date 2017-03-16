@@ -1,7 +1,3 @@
-// Client.cpp : Defines the entry point for the console application.
-//
-
-//#include "stdafx.h"
 #include <boost/shared_ptr.hpp>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 #include <boost/log/trivial.hpp>
@@ -30,21 +26,23 @@ void init()
 	logging::add_common_attributes();
 	logging::core::get()->set_filter
 		(
-		logging::trivial::severity >= logging::trivial::info												   //установка уровня важности лога
+		logging::trivial::severity >= logging::trivial::info												   //СѓСЃС‚Р°РЅРѕРІРєР° СѓСЂРѕРІРЅСЏ РІР°Р¶РЅРѕСЃС‚Рё Р»РѕРіР°
 		);
 
-	auto fmtTimeStamp = expr::format_date_time<boost::posix_time::ptime>("TimeStamp", "%Y-%m-%d %H:%M:%S.%f"); //переменная для отображения даты в заданном формате
-	auto fmtSeverity = expr::attr<logging::trivial::severity_level>("Severity");							   //переменная для отображения уровня важности
+	auto fmtTimeStamp = expr::format_date_time<boost::posix_time::ptime>("TimeStamp", "%Y-%m-%d %H:%M:%S.%f"); //РїРµСЂРµРјРµРЅРЅР°СЏ РґР»СЏ РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ РґР°С‚С‹ РІ Р·Р°РґР°РЅРЅРѕРј С„РѕСЂРјР°С‚Рµ
+	auto fmtSeverity = expr::attr<logging::trivial::severity_level>("Severity");							   //РїРµСЂРµРјРµРЅРЅР°СЏ РґР»СЏ РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ СѓСЂРѕРІРЅСЏ РІР°Р¶РЅРѕСЃС‚Рё
 
+	auto consoleSink = boost::log::add_console_log(std::clog);
 	auto fsSink = logging::add_file_log																		   
 		(
-		keywords::file_name = "test_%Y-%m-%d_%H-%M-%S.%N.log",												   //настройка формата имени файла с логами
-		keywords::rotation_size = 10 * 1024 * 1024															   //вес файла, при достижении которого будет создан новый
+		keywords::file_name = "test_%Y-%m-%d_%H-%M-%S.%N.log",												   //РЅР°СЃС‚СЂРѕР№РєР° С„РѕСЂРјР°С‚Р° РёРјРµРЅРё С„Р°Р№Р»Р° СЃ Р»РѕРіР°РјРё
+		keywords::rotation_size = 10 * 1024 * 1024															   //РІРµСЃ С„Р°Р№Р»Р°, РїСЂРё РґРѕСЃС‚РёР¶РµРЅРёРё РєРѕС‚РѕСЂРѕРіРѕ Р±СѓРґРµС‚ СЃРѕР·РґР°РЅ РЅРѕРІС‹Р№
 		//keywords::time_based_rotation = sinks::file::rotation_at_time_point(0, 0, 0),
 		);
-	logging::formatter logFmt = expr::format("[%1%] (%2%) %3%")												   //настройка формата лога в файле
+	logging::formatter logFmt = expr::format("[%1%] (%2%) %3%")												   //РЅР°СЃС‚СЂРѕР№РєР° С„РѕСЂРјР°С‚Р° Р»РѕРіР° РІ С„Р°Р№Р»Рµ
 		% fmtTimeStamp % fmtSeverity % expr::smessage;
 	fsSink->set_formatter(logFmt);
+	consoleSink->set_formatter(logFmt);
 
 }
 
@@ -54,7 +52,7 @@ int main(int argc, char **argv)
 
 	//BOOST_LOG_TRIVIAL(trace) << "A trace severity message";
 	//BOOST_LOG_TRIVIAL(debug) << "A debug severity message";
-	//BOOST_LOG_TRIVIAL(info) << "An informational severity message";						//Макросы для печати логов
+	//BOOST_LOG_TRIVIAL(info) << "An informational severity message";						//РњР°РєСЂРѕСЃС‹ РґР»СЏ РїРµС‡Р°С‚Рё Р»РѕРіРѕРІ
 	//BOOST_LOG_TRIVIAL(warning) << "A warning severity message";
 	//BOOST_LOG_TRIVIAL(error) << "An error severity message";
 	//BOOST_LOG_TRIVIAL(fatal) << "A fatal severity message";
@@ -63,10 +61,11 @@ int main(int argc, char **argv)
 	try
 	{
 		boost::asio::io_service io;
-		tcp::socket sock(io);																//создаем сокет
+		tcp::socket sock(io);																//СЃРѕР·РґР°РµРј СЃРѕРєРµС‚
 		tcp::endpoint endPoint(boost::asio::ip::address::from_string("127.0.0.1"), 9090);
+		BOOST_LOG_TRIVIAL(info) << "Connecting to: " << endPoint;
 		boost::system::error_code err;
-		sock.connect(endPoint, err);														//производим соединение
+		sock.connect(endPoint, err);														//РїСЂРѕРёР·РІРѕРґРёРј СЃРѕРµРґРёРЅРµРЅРёРµ
 		if (err)
 		{
 			throw boost::system::system_error(err);
@@ -78,8 +77,8 @@ int main(int argc, char **argv)
 			BOOST_LOG_TRIVIAL(info) << "Connection established";
 		}
 		boost::asio::streambuf sbuf;
-		boost::asio::read_until(sock, sbuf, "!");											//операция синхронного чтения, пока не встретится знак "!"
-		std::cout << &sbuf << std::endl;													//вывод прочитанного
+		boost::asio::read_until(sock, sbuf, "!");											//РѕРїРµСЂР°С†РёСЏ СЃРёРЅС…СЂРѕРЅРЅРѕРіРѕ С‡С‚РµРЅРёСЏ, РїРѕРєР° РЅРµ РІСЃС‚СЂРµС‚РёС‚СЃСЏ Р·РЅР°Рє "!"
+		std::cout << &sbuf << std::endl;													//РІС‹РІРѕРґ РїСЂРѕС‡РёС‚Р°РЅРЅРѕРіРѕ
 		sock.close();
 	}
 	catch(std::exception& e)
